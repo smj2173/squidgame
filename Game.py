@@ -65,7 +65,7 @@ class Game():
 
         if len(player_neighbors) == 0:
             self.over = True
-            return 2
+            return 2 # player lost / computer Wins 
         
         elif self.over:
             return turn
