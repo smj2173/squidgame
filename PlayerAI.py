@@ -64,6 +64,23 @@ class PlayerAI(BaseAI):
         """
         avaliable_cells = grid.getAvailableCells()
         return avaliable_cells[0]
+
+     def getMoveHeuristic(self, grid : Grid) -> int:
+         # the difference between the current number of moves Player (You) 
+         #can make and the current number of moves the opponent can make.
+         
+         #moves player1 can make 
+        player_neighbors = self.grid.get_neighbors(self.playerAI.getPosition(), only_available=True)
+
+         #moves player2 can make 
+        opponent_neighbors = self.grid.get_neighbors(self.computerAI.getPosition(), only_available=True)
+
+        improved_score = len(player_neighbors) - len(opponent_neighbors)
+
+        return improved_score
+         
+
+         
         
 
     
