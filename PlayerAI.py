@@ -5,6 +5,8 @@ import sys
 import os 
 from BaseAI import BaseAI
 from Grid import Grid
+#setting path to parent directory
+sys.path.append(os.getcwd())
 
 # TO BE IMPLEMENTED
 # 
