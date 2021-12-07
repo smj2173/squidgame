@@ -44,7 +44,9 @@ class PlayerAI(BaseAI):
         You may adjust the input variables as you wish (though it is not necessary). Output has to be (x,y) coordinates.
         
         """
-        pass
+        #get random move 
+        avaliable_cells = grid.getAvailableCells()
+        return avaliable_cells[0]
 
     def getTrap(self, grid : Grid) -> tuple:
         """ 
@@ -60,7 +62,8 @@ class PlayerAI(BaseAI):
         You may adjust the input variables as you wish (though it is not necessary). Output has to be (x,y) coordinates.
         
         """
-        pass
+        avaliable_cells = grid.getAvailableCells()
+        return avaliable_cells[0]
         
 
     
