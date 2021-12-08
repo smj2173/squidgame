@@ -5,6 +5,7 @@ import sys
 import os 
 from BaseAI import BaseAI
 from Grid import Grid
+import Utils
 #setting path to parent directory
 sys.path.append(os.getcwd())
 
@@ -63,15 +64,22 @@ class PlayerAI(BaseAI):
         
         """
         #heuristic to determine which cells to consider > slowly reduce which cells are available to throw trap
+        cloned = grid.clone()
 
         available_cells = grid.getAvailableCells()
         pos_1 = grid.find(1) #position of player 1 (us)
-        pos_2 = grid.find(2) #position of player 2 (opponent)
+        pos_2 = grid.find(2) #position of player 2 (opponent) 
+        #opponent can also be player 3 (not computer)
         options = []
+
 
         neighbors = grid.get_neighbors(pos_2, True) #available neighbors of player 2
         for tup in neighbors: #add available neighboring cells of opponent to list of cells to consider
             options.append(tup) # add all neighbors of player 2
+
+        return options[0]
+        
+        
             
         
         
