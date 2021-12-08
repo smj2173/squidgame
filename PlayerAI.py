@@ -55,11 +55,39 @@ class PlayerAI(BaseAI):
         #improved score
         pos_1 = grid.find(1) #position of player 1 (us)
         pos_2 = grid.find(2) #position of player 2 (opponent) 
-        possible_moves_1 = len(grid.get_neighbors(self, pos_1, True)) # num available neighbors to move to
-        possible_moves_2 = len(grid.get_neighbors(self, pos_2, True)) #
+        possible_moves_1 = len(grid.get_neighbors(pos_1, True)) # num available neighbors to move to
+        possible_moves_2 = len(grid.get_neighbors(pos_2, True)) #
         improved_score = possible_moves_1 - possible_moves_2
         #bigger number for IS means better chances for player 1
         return improved_score
+
+    def maximize(grid: Grid)->tuple: #how does utility work here?
+        if len(grid.getAvailableCells()) == 0: #terminal state
+            return None
+        ans = (None, -10000000000)
+        for child in grid:
+            tup = PlayerAI.minimize(child)
+            if tup[1] > ans[1]:
+                ans = (child, tup[1])
+        return ans
+
+    def minimize(grid)->tuple:
+        if len(grid.getAvailableCells()) == 0: #terminal state
+            return None
+        ans = (None, 10000000000)
+        for child in grid:
+            tup = PlayerAI.maximize(child)
+            if tup[1] < ans[1]:
+                ans = (child, tup[1])
+
+        return ans
+
+    def decision(grid : Grid)->tuple: 
+        tup = PlayerAI.maximize(grid)
+        return tup
+        #need to incorporate probability of success p into minimax
+        #utility related to p somehow?
+
 
     def getTrap(self, grid : Grid) -> tuple:
         """ 
@@ -76,7 +104,6 @@ class PlayerAI(BaseAI):
         
         """
         #heuristic to determine which cells to consider > slowly reduce which cells are available to throw trap
-        cloned = grid.clone()
 
         available_cells = grid.getAvailableCells()
         pos_1 = grid.find(1) #position of player 1 (us)
@@ -89,6 +116,11 @@ class PlayerAI(BaseAI):
         for tup in neighbors: #add available neighboring cells of opponent to list of cells to consider
             options.append(tup) # add all neighbors of player 2
 
+        #initial utility
+        utility = PlayerAI.utility(self, grid) #what do i do w this?
+        #ans = PlayerAI.decision(grid)
+        #minimax not working yet and does not incorporate chance or options
+
         return options[0]
         
         
@@ -99,7 +131,7 @@ class PlayerAI(BaseAI):
         
 
         
-        
+    
         
 
     
