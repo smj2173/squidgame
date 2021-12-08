@@ -62,8 +62,25 @@ class PlayerAI(BaseAI):
         You may adjust the input variables as you wish (though it is not necessary). Output has to be (x,y) coordinates.
         
         """
-        avaliable_cells = grid.getAvailableCells()
-        return avaliable_cells[0]
+        #heuristic to determine which cells to consider > slowly reduce which cells are available to throw trap
+
+        available_cells = grid.getAvailableCells()
+        pos_1 = grid.find(1) #position of player 1 (us)
+        pos_2 = grid.find(2) #position of player 2 (opponent)
+        #remove positions of players (don't want traps to go there)
+        options = []
+
+        neighbors = grid.get_neighbors(pos_2, True) #available neighbors of player 2
+        for tup in neighbors: #add available neighboring cells of opponent to list of cells to consider
+            options.append(tup) # add all neighbors of player 2
+            
+        
+        
+        
+        
+
+        
+        
         
 
     

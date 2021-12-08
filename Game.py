@@ -32,7 +32,7 @@ class Game():
 
         '''
         self.grid       = Grid(N)
-        self.playerAI   = playerAI or ComputerAI() 
+        self.playerAI   = playerAI or PlayerAI() 
         self.computerAI = computerAI or ComputerAI() 
         self.dim        = N
         self.over       = False
