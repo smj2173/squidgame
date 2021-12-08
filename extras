@@ -1,0 +1,25 @@
+def maximize(grid)->tuple:
+        if 0 not in grid: # if all spaces full (terminal test)
+            return None
+        ans = tuple(None, 100000000)
+        for child in grid.children():
+            t = minimize(child)
+
+
+
+    def minimize(grid)->tuple:
+        if 0 not in grid: # if all spaces full
+            return None
+        ans = tuple(None, 1000000)
+
+        for child in grid.children():
+            t = maximize(child)
+            if tuple[1] < minUtility:
+                ans = (child, tuple[1])
+
+        return tuple(1, 1)
+            
+
+    def minimax(grid)->tuple:
+        ans = maximize(grid)
+        return ans
