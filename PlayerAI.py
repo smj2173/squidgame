@@ -67,7 +67,6 @@ class PlayerAI(BaseAI):
         available_cells = grid.getAvailableCells()
         pos_1 = grid.find(1) #position of player 1 (us)
         pos_2 = grid.find(2) #position of player 2 (opponent)
-        #remove positions of players (don't want traps to go there)
         options = []
 
         neighbors = grid.get_neighbors(pos_2, True) #available neighbors of player 2
