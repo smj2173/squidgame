@@ -49,6 +49,18 @@ class PlayerAI(BaseAI):
         avaliable_cells = grid.getAvailableCells()
         return avaliable_cells[0]
 
+
+    def utility(self, grid: Grid):
+        #returns some numerical value that estimates the goodness of this state for you
+        #improved score
+        pos_1 = grid.find(1) #position of player 1 (us)
+        pos_2 = grid.find(2) #position of player 2 (opponent) 
+        possible_moves_1 = len(grid.get_neighbors(self, pos_1, True)) # num available neighbors to move to
+        possible_moves_2 = len(grid.get_neighbors(self, pos_2, True)) #
+        improved_score = possible_moves_1 - possible_moves_2
+        #bigger number for IS means better chances for player 1
+        return improved_score
+
     def getTrap(self, grid : Grid) -> tuple:
         """ 
         YOUR CODE GOES HERE
