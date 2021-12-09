@@ -8,6 +8,7 @@ from Grid import Grid
 import Utils
 #setting path to parent directory
 sys.path.append(os.getcwd())
+sys.setrecursionlimit(10000)
 
 # TO BE IMPLEMENTED
 # 
@@ -61,30 +62,40 @@ class PlayerAI(BaseAI):
         #bigger number for IS means better chances for player 1
         return improved_score
 
-    def maximize(grid: Grid)->tuple: #how does utility work here?
+    def maximize(grid: Grid, options)->tuple:
         if len(grid.getAvailableCells()) == 0: #terminal state
             return None
         ans = (None, -10000000000)
-        for child in grid:
-            tup = PlayerAI.minimize(child)
-            if tup[1] > ans[1]:
-                ans = (child, tup[1])
+        for child in options:
+            utility = PlayerAI.utility_trap(grid.find(1), child)
+            list1 = [child]
+            output = PlayerAI.minimize(grid, list1)
+            if output[1] > ans[1]:
+                ans = (child, output[1])
         return ans
 
-    def minimize(grid)->tuple:
+    def utility_trap(p1, option):     
+        #option is intended position (i.e. one of the values of options)
+        p = 1 - 0.05*(Utils.manhattan_distance(p1, option) - 1)
+        return p
+
+    def minimize(grid : Grid, options)->tuple:
         if len(grid.getAvailableCells()) == 0: #terminal state
             return None
-        ans = (None, 10000000000)
-        for child in grid:
-            tup = PlayerAI.maximize(child)
-            if tup[1] < ans[1]:
-                ans = (child, tup[1])
-
+        ans = (None, 10000000000) #100000000 is initial utility value
+        for child in options:
+            utility = PlayerAI.utility_trap(grid.find(1), child)
+            if utility < ans[1]:
+                ans = (child, utility)
+            list1 = [child]
+            output = PlayerAI.maximize(grid, list1)
+            if output[1] < ans[1]:
+                ans = (child, output[1])
         return ans
 
-    def decision(grid : Grid)->tuple: 
-        tup = PlayerAI.maximize(grid)
-        return tup
+    def decision(grid: Grid, options)->tuple:
+        ans =  PlayerAI.maximize(grid, options)
+        return ans
         #need to incorporate probability of success p into minimax
         #utility related to p somehow?
 
@@ -103,8 +114,10 @@ class PlayerAI(BaseAI):
         You may adjust the input variables as you wish (though it is not necessary). Output has to be (x,y) coordinates.
         
         """
-        avaliable_cells = grid.getAvailableCells()
-        return avaliable_cells[0]
+        available_cells = grid.getAvailableCells()
+        options = PlayerAI.getTrapHeuristic(self, grid) #possible trap locations
+        #ans = PlayerAI.decision(grid, options)
+        return available_cells[0]
 
     def getMoveHeuristic(self, grid : Grid) -> int:
         # the difference between the current number of moves Player (You) 
@@ -120,10 +133,9 @@ class PlayerAI(BaseAI):
 
         return improved_score
         
-    def getTrapHeuristic(self, grid : Grid) -> int:    
+    def getTrapHeuristic(self, grid : Grid) -> list:    
         #heuristic to determine which cells to consider > slowly reduce which cells are available to throw trap
 
-        available_cells = grid.getAvailableCells()
         pos_1 = grid.find(1) #position of player 1 (us)
         pos_2 = grid.find(2) #position of player 2 (opponent) 
         #opponent can also be player 3 (not computer)
@@ -134,12 +146,8 @@ class PlayerAI(BaseAI):
         for tup in neighbors: #add available neighboring cells of opponent to list of cells to consider
             options.append(tup) # add all neighbors of player 2
 
-        #initial utility
-        utility = PlayerAI.utility(self, grid) #what do i do w this?
-        #ans = PlayerAI.decision(grid)
-        #minimax not working yet and does not incorporate chance or options
-
-        return options[0]
+        print(options)
+        return options
         
         
             
