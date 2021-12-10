@@ -44,11 +44,88 @@ class PlayerAI(BaseAI):
         Note that you are not required to account for the probabilities of it landing in a different cell.
 
         You may adjust the input variables as you wish (though it is not necessary). Output has to be (x,y) coordinates.
+
+        getMax minimax tree : Max --> chance --> min --> max
         
         """
-        #get random move 
+        #get move from heuristic
         avaliable_cells = grid.getAvailableCells()
-        return avaliable_cells[0]
+        potential_cells = getPotentialMoves(self, grid, avaliable_cells)
+        # call and return outcome of moveExpectedMinimax for decision
+        move = moveExpectedMinimax(grid, potential_cells)
+        
+
+        return avaliable_cells[0] #should be move[0] but keeping this for now for code to work 
+
+    def moveExpectedMinimax(grid: Grid) -> tuple:
+        """
+        move strategically to avoid being trapped by the opponent
+        pick the best course of action (i.e., maximize utility) based on where you predict that the Opponent might throw a trap.
+        """
+        avaliable_cells = grid.getAvailableCells()
+        if len(potential_cells) == 0: #terminal state
+            return None
+
+        potential_cells = getPotentialMoves(self, grid, avaliable_cells)
+
+        maxNode = (None, -10000000000) #(maxChild, maxUtility)
+        #maximize 
+
+        for child in potential_cells:
+            #TO-DO: chance 
+
+            #minimize 
+            minNode = PlayerAI.minimize(grid, list1)
+            if minNode[1] > maxNode[1]: #utility comparison
+                maxNode = (child, minNode[1])
+
+        return maxNode
+       
+    def moveMinimize(grid) -> tuple : 
+        avaliable_cells = grid.getAvailableCells()
+        if len(potential_cells) == 0: #terminal state
+            return None
+
+        potential_cells = getPotentialMoves(self, grid, avaliable_cells)
+
+        minNode = (None, 10000000000) #(minChild, minUtility)
+        #maximize 
+
+        for child in potential_cells:    
+            #maximize
+            maxNode = moveExpectedMinimax(grid)
+            if maxNode[1] < minNode[1]: #utility comparison
+                minNode = (child, maxNode[1])
+
+        return minNode
+
+
+
+    def getPotentialMoves(self, grid: Grid, available_cells) -> list:
+        #using heuristic to determine which cells to consider to move to 
+        options = []
+
+        for cell in available_cells:
+            if getMoveHeuristic(self, grid, cell) > 0:
+                options.append(cell)
+
+        return options
+
+    def getMoveHeuristic(self, grid : Grid, cell : tuple) -> int:
+        # the difference between the current number of moves Player (You) 
+        #can make and the current number of moves the opponent can make.
+
+        # if player1 has more free neighbors (score > 0), it is a good cell 
+         
+        #moves player1 can make at this cell
+        player_neighbors = self.grid.get_neighbors(cell, only_available=True)
+
+        #moves player2 can make 
+        opponent_neighbors = self.grid.get_neighbors(self.computerAI.getPosition(), only_available=True)
+
+        improved_score = len(player_neighbors) - len(opponent_neighbors)
+
+        return improved_score
 
     def utility_trap(p1, option):     
         #option is intended position (i.e. one of the values of options)
@@ -103,19 +180,6 @@ class PlayerAI(BaseAI):
         ans = PlayerAI.decision(grid, options)
         return ans
 
-    def getMoveHeuristic(self, grid : Grid) -> int:
-        # the difference between the current number of moves Player (You) 
-        #can make and the current number of moves the opponent can make.
-         
-        #moves player1 can make 
-        player_neighbors = self.grid.get_neighbors(self.playerAI.getPosition(), only_available=True)
-
-        #moves player2 can make 
-        opponent_neighbors = self.grid.get_neighbors(self.computerAI.getPosition(), only_available=True)
-
-        improved_score = len(player_neighbors) - len(opponent_neighbors)
-
-        return improved_score
         
     def getTrapHeuristic(self, grid : Grid) -> list:    
         #heuristic to determine which cells to consider > slowly reduce which cells are available to throw trap
