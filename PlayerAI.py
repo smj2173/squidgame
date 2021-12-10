@@ -75,7 +75,7 @@ class PlayerAI(BaseAI):
             #TO-DO: chance 
 
             #minimize 
-            minNode = PlayerAI.minimize(grid, list1)
+            minNode = moveMinimize(grid)
             if minNode[1] > maxNode[1]: #utility comparison
                 maxNode = (child, minNode[1])
 
