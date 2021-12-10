@@ -93,7 +93,7 @@ class PlayerAI(BaseAI):
 
         for child in potential_cells:    
             #maximize
-            maxNode = PlayerAI.moveExpectedMinimax(grid)
+            maxNode = PlayerAI.moveExpectedMinimax(self,grid,potential_cells)
             if maxNode[1] < minNode[1]: #utility comparison
                 minNode = (child, maxNode[1])
 
@@ -118,10 +118,10 @@ class PlayerAI(BaseAI):
         # if player1 has more free neighbors (score > 0), it is a good cell 
          
         #moves player1 can make at this cell
-        player_neighbors = self.grid.get_neighbors(cell, only_available=True)
+        player_neighbors = grid.get_neighbors(cell, only_available=True)
 
         #moves player2 can make 
-        opponent_neighbors = self.grid.get_neighbors(self.computerAI.getPosition(), only_available=True)
+        opponent_neighbors = grid.get_neighbors(grid.find(2), only_available=True)
 
         improved_score = len(player_neighbors) - len(opponent_neighbors)
 
