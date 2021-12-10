@@ -50,14 +50,14 @@ class PlayerAI(BaseAI):
         """
         #get move from heuristic
         avaliable_cells = grid.getAvailableCells()
-        potential_cells = getPotentialMoves(self, grid, avaliable_cells)
+        potential_cells = PlayerAI.getPotentialMoves(self, grid, avaliable_cells)
         # call and return outcome of moveExpectedMinimax for decision
-        move = moveExpectedMinimax(grid, potential_cells)
+        move = PlayerAI.moveExpectedMinimax(self, grid, potential_cells)
         
 
         return avaliable_cells[0] #should be move[0] but keeping this for now for code to work 
 
-    def moveExpectedMinimax(grid: Grid) -> tuple:
+    def moveExpectedMinimax(self, grid: Grid, potential_cells) -> tuple:
         """
         move strategically to avoid being trapped by the opponent
         pick the best course of action (i.e., maximize utility) based on where you predict that the Opponent might throw a trap.
@@ -66,7 +66,7 @@ class PlayerAI(BaseAI):
         if len(potential_cells) == 0: #terminal state
             return None
 
-        potential_cells = getPotentialMoves(self, grid, avaliable_cells)
+        potential_cells = PlayerAI.getPotentialMoves(self, grid, avaliable_cells)
 
         maxNode = (None, -10000000000) #(maxChild, maxUtility)
         #maximize 
@@ -75,25 +75,25 @@ class PlayerAI(BaseAI):
             #TO-DO: chance 
 
             #minimize 
-            minNode = moveMinimize(grid)
+            minNode = PlayerAI.moveMinimize(self, grid, potential_cells)
             if minNode[1] > maxNode[1]: #utility comparison
                 maxNode = (child, minNode[1])
 
         return maxNode
        
-    def moveMinimize(grid) -> tuple : 
+    def moveMinimize(self, grid, potential_cells) -> tuple : 
         avaliable_cells = grid.getAvailableCells()
         if len(potential_cells) == 0: #terminal state
             return None
 
-        potential_cells = getPotentialMoves(self, grid, avaliable_cells)
+        potential_cells = PlayerAI.getPotentialMoves(self, grid, avaliable_cells)
 
         minNode = (None, 10000000000) #(minChild, minUtility)
         #maximize 
 
         for child in potential_cells:    
             #maximize
-            maxNode = moveExpectedMinimax(grid)
+            maxNode = PlayerAI.moveExpectedMinimax(grid)
             if maxNode[1] < minNode[1]: #utility comparison
                 minNode = (child, maxNode[1])
 
@@ -106,7 +106,7 @@ class PlayerAI(BaseAI):
         options = []
 
         for cell in available_cells:
-            if getMoveHeuristic(self, grid, cell) > 0:
+            if PlayerAI.getMoveHeuristic(self, grid, cell) > 0:
                 options.append(cell)
 
         return options
