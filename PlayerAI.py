@@ -55,19 +55,23 @@ class PlayerAI(BaseAI):
         p = 1 - 0.05*(Utils.manhattan_distance(p1, option) - 1)
         return p
 
-    def maximize(grid: Grid, options)->tuple:
+    def maximize(grid: Grid, options, a, b)->tuple:
         if len(grid.getAvailableCells()) == 0: #terminal state
             return None
         ans = (None, -10000000000)
         for child in options:
             print(child)
             list1 = [child]
-            output = PlayerAI.minimize(grid, list1)
+            output = PlayerAI.minimize(grid, list1, a, b)
             if output[1] > ans[1]: #utility
                 ans = (child, output[1])
+            if ans[1] >= b:
+                break
+            if ans[1] > a:
+                a = ans[1]
         return ans
 
-    def minimize(grid : Grid, options)->tuple:
+    def minimize(grid : Grid, options, a, b)->tuple:
         if len(grid.getAvailableCells()) == 0: #terminal state
             return None
         ans = (None, 10000000000) #100000000 is initial utility value
@@ -75,10 +79,14 @@ class PlayerAI(BaseAI):
             utility = PlayerAI.utility_trap(grid.find(1), child)
             if utility < ans[1]:
                 ans = (child, utility)
+            if ans[1] <= a:
+                break
+            if ans[1] < b:
+                b = ans[1]
         return ans
 
     def decision(grid: Grid, options)->tuple:
-        ans =  PlayerAI.maximize(grid, options)
+        ans =  PlayerAI.maximize(grid, options, -10000000000, 10000000000)
         return ans[0]
 
 
