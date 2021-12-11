@@ -48,7 +48,7 @@ class PlayerAI(BaseAI):
         avaliable_cells = grid.get_neighbors(playerPos,True)
         print("avaliable cells: " + str(avaliable_cells))
         for child in avaliable_cells:
-            print(str(child) + "'s utility: " +  PlayerAI.getMoveHeuristic(self, grid, child)) 
+            print(str(child) + "'s utility: " +  str(PlayerAI.getMoveHeuristic(self, grid, child))) 
            
         
 
