@@ -46,11 +46,10 @@ class PlayerAI(BaseAI):
         print("player1 at " + str(playerPos))
         #get move from heuristic
         avaliable_cells = grid.get_neighbors(playerPos,True)
-
-        potential_cells = PlayerAI.getPotentialMoves(self, grid, avaliable_cells)
+        print("avaliable cells" + str(avaliable_cells))
 
         # call and return outcome of moveExpectedMinimax for decision
-        move = PlayerAI.moveExpectedMinimax(self, grid, potential_cells, playerPos, True, depth, -10000000000, 10000000000)
+        move = PlayerAI.moveExpectedMinimax(self, grid, avaliable_cells, playerPos, True, depth, -10000000000, 10000000000)
         print("move is" + str(move[0]))
         print("utility is" + str(move[1]))
         if move[0] is None:
@@ -68,16 +67,10 @@ class PlayerAI(BaseAI):
         pick the best course of action (i.e., maximize utility) based on where you predict that the Opponent might throw a trap.
         """
         if depth == 5 or potential_cells == 0 or len(grid.getAvailableCells()) == 0: #terminal state
-            ''''if depth == 5: 
-                print("depth at 5")
-            if potential_cells == 0:
-                print("potnetial cells is 0")
-            if len(grid.getAvailableCells()) == 0:
-                print("grid is full") '''
-            print("terminal node reached")
             return (None, PlayerAI.getMoveHeuristic(self, grid, pos)) 
 
         if maximizing: 
+            #print("maximizing")
             maxNode = (None, -10000000000) #(maxChild, maxUtility)
             for child in potential_cells:
                 minNode = PlayerAI.moveExpectedMinimax(self, grid, potential_cells, child, False, depth+1, a, b)
@@ -89,6 +82,7 @@ class PlayerAI(BaseAI):
             return maxNode
 
         else:
+            #print("minimizing")
             minNode = (None, 10000000000) #(minChild, minUtility)
             for child in potential_cells:    
                 maxNode = PlayerAI.moveExpectedMinimax(self, grid,potential_cells, child, True, depth+1, a, b)
@@ -99,15 +93,6 @@ class PlayerAI(BaseAI):
                     break
             return minNode
 
-    def getPotentialMoves(self, grid: Grid, available_cells) -> list:
-        #using heuristic to determine which cells to consider to move to 
-        options = []
-
-        for cell in available_cells:
-            if PlayerAI.getMoveHeuristic(self, grid, cell) > 0:
-                options.append(cell)
-
-        return options
 
     def getMoveHeuristic(self, grid : Grid, cell : tuple) -> int:
         # the difference between the current number of moves Player (You) 
@@ -122,6 +107,8 @@ class PlayerAI(BaseAI):
         opponent_neighbors = grid.get_neighbors(grid.find(2), only_available=True)
 
         improved_score = len(player_neighbors) - len(opponent_neighbors)
+
+        #if 
 
         return improved_score
 
