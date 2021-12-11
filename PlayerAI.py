@@ -46,17 +46,21 @@ class PlayerAI(BaseAI):
         print("player1 at " + str(playerPos))
         #get move from heuristic
         avaliable_cells = grid.get_neighbors(playerPos,True)
-        print("avaliable cells" + str(avaliable_cells))
+        print("avaliable cells: " + str(avaliable_cells))
+        for child in avaliable_cells:
+            print(str(child) + "'s utility: " +  PlayerAI.getMoveHeuristic(self, grid, child)) 
+           
+        
 
         # call and return outcome of moveExpectedMinimax for decision
         move = PlayerAI.moveExpectedMinimax(self, grid, avaliable_cells, playerPos, True, depth, -10000000000, 10000000000)
         print("move is" + str(move[0]))
         print("utility is" + str(move[1]))
-        if move[0] is None:
-            return PlayerAI.moveDecision(move[1], potential_cells)
-        return move[0] #should be move[0] but keeping this for now for code to work 
+
+  
+        return PlayerAI.moveDecision(self, grid, move[1], avaliable_cells) #should be move[0] but keeping this for now for code to work 
    
-    def moveDecision(utility, potential_cells) -> tuple:
+    def moveDecision(self, grid, utility, potential_cells) -> tuple:
         for child in potential_cells:
             if PlayerAI.getMoveHeuristic(self, grid, child) == utility:
                 return child
@@ -101,14 +105,15 @@ class PlayerAI(BaseAI):
         # if player1 has more free neighbors (score > 0), it is a good cell 
          
         #moves player1 can make at this cell
+       
         player_neighbors = grid.get_neighbors(cell, only_available=True)
+
 
         #moves player2 can make 
         opponent_neighbors = grid.get_neighbors(grid.find(2), only_available=True)
 
         improved_score = len(player_neighbors) - len(opponent_neighbors)
 
-        #if 
 
         return improved_score
 
@@ -173,7 +178,6 @@ class PlayerAI(BaseAI):
         pos_2 = grid.find(2) #position of player 2 (opponent) 
         #opponent can also be player 3 (not computer)
         options = []
-
 
         neighbors = grid.get_neighbors(pos_2, True) #available neighbors of player 2
         for tup in neighbors: #add available neighboring cells of opponent to list of cells to consider
