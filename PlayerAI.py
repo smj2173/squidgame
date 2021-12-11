@@ -112,6 +112,7 @@ class PlayerAI(BaseAI):
             #attack 
             return (len(player_neighbors) * 2)- len(opponent_neighbors)
         else: 
+            #defense
             return len(player_neighbors) - (2 * len(opponent_neighbors))
 
 
