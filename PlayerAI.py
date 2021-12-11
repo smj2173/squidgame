@@ -49,15 +49,11 @@ class PlayerAI(BaseAI):
         print("avaliable cells: " + str(avaliable_cells))
         for child in avaliable_cells:
             print(str(child) + "'s utility: " +  str(PlayerAI.getMoveHeuristic(self, grid, child))) 
-           
-        
 
         # call and return outcome of moveExpectedMinimax for decision
         move = PlayerAI.moveExpectedMinimax(self, grid, avaliable_cells, playerPos, True, depth, -10000000000, 10000000000)
-        print("move is" + str(move[0]))
         print("utility is" + str(move[1]))
 
-  
         return PlayerAI.moveDecision(self, grid, move[1], avaliable_cells) #should be move[0] but keeping this for now for code to work 
    
     def moveDecision(self, grid, utility, potential_cells) -> tuple:
@@ -108,14 +104,17 @@ class PlayerAI(BaseAI):
        
         player_neighbors = grid.get_neighbors(cell, only_available=True)
 
-
         #moves player2 can make 
         opponent_neighbors = grid.get_neighbors(grid.find(2), only_available=True)
 
-        improved_score = len(player_neighbors) - len(opponent_neighbors)
+        #winning
+        if len(player_neighbors) > len(opponent_neighbors): 
+            #attack 
+            return (len(player_neighbors) * 2)- len(opponent_neighbors)
+        else: 
+            return len(player_neighbors) - (2 * len(opponent_neighbors))
 
 
-        return improved_score
 
     def utility_trap(p1, option):     
         #option is intended position (i.e. one of the values of options)
