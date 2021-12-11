@@ -122,14 +122,13 @@ class PlayerAI(BaseAI):
         p = 1 - 0.05*(Utils.manhattan_distance(p1, option) - 1)
         return p
 
-    def maximize(grid: Grid, options, a, b)->tuple:
-        if len(grid.getAvailableCells()) == 0: #terminal state
+    def maximize(grid: Grid, options, a, b, depth)->tuple:
+        if len(grid.getAvailableCells()) == 0 or depth == 5: #terminal state
             return None
         ans = (None, -10000000000)
         for child in options:
-            print(child)
             list1 = [child]
-            output = PlayerAI.minimize(grid, list1, a, b)
+            output = PlayerAI.minimize(grid, list1, a, b, depth+1)
             if output[1] > ans[1]: #utility
                 ans = (child, output[1])
             if ans[1] >= b:
@@ -138,8 +137,8 @@ class PlayerAI(BaseAI):
                 a = ans[1]
         return ans
 
-    def minimize(grid : Grid, options, a, b)->tuple:
-        if len(grid.getAvailableCells()) == 0: #terminal state
+    def minimize(grid : Grid, options, a, b, depth)->tuple:
+        if len(grid.getAvailableCells()) == 0 or depth == 5: #terminal state
             return None
         ans = (None, 10000000000) #100000000 is initial utility value
         for child in options:
@@ -152,8 +151,8 @@ class PlayerAI(BaseAI):
                 b = ans[1]
         return ans
 
-    def decision(grid: Grid, options)->tuple:
-        ans =  PlayerAI.maximize(grid, options, -10000000000, 10000000000)
+    def decision(grid: Grid, options, depth)->tuple:
+        ans =  PlayerAI.maximize(grid, options, -10000000000, 10000000000, depth+1)
         return ans[0]
 
 
@@ -166,8 +165,9 @@ class PlayerAI(BaseAI):
         You may adjust the input variables as you wish (though it is not necessary). Output has to be (x,y) coordinates.
         """
         available_cells = grid.getAvailableCells()
+        depth = 0
         options = PlayerAI.getTrapHeuristic(self, grid) #possible trap locations
-        ans = PlayerAI.decision(grid, options)
+        ans = PlayerAI.decision(grid, options, depth)
         return ans
 
         
