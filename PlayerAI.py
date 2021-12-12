@@ -128,9 +128,23 @@ class PlayerAI(BaseAI):
 
     def utility_trap(grid, p1, p2, option):     
         #option is intended position (i.e. one of the values of options)
+        game_status = len(grid.getAvailableCells()) / 49 
         p = 1 - 0.05*(Utils.manhattan_distance(p1, option) - 1)
-        moves = len(grid.get_neighbors(option, only_available=True)) - len(grid.get_neighbors(p2, only_available=True))
-        return p+moves
+
+        p1_neighbors = len(grid.get_neighbors(p1, only_available=True))
+        op_neighbors = len(grid.get_neighbors(p2, only_available=True))
+        if game_status < 0.5 :
+            #winning
+            if p1_neighbors > op_neighbors: 
+                #attack 
+                return (p1_neighbors - (2 * op_neighbors))*p
+            else: 
+                #defense
+                return ((p1_neighbors * 2)- op_neighbors)*p
+        
+        #late into the game --> play defense
+        else: 
+            return ((p1_neighbors * 2)- op_neighbors)*p
 
     def maximize(grid: Grid, options, a, b)->tuple:
         if len(grid.getAvailableCells()) == 0: #terminal state
