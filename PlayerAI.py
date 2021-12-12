@@ -100,7 +100,7 @@ class PlayerAI(BaseAI):
 
         #moves player1 can make at this cell
         #chance of computer trap NOT landing at cell 
-        chance = 1 - PlayerAI.utility_trap(grid.find(2), cell)
+        chance = 1 - PlayerAI.utility_trap(grid, grid.find(1), grid.find(2), cell)
 
        
         player_neighbors = grid.get_neighbors(cell, only_available=True)
@@ -118,17 +118,17 @@ class PlayerAI(BaseAI):
 
 
 
-    def utility_trap(p1, option):     
+    def utility_trap(grid, p1, p2, option):     
         #option is intended position (i.e. one of the values of options)
         p = 1 - 0.05*(Utils.manhattan_distance(p1, option) - 1)
-        return p
+        moves = len(grid.get_neighbors(option, only_available=True)) - len(grid.get_neighbors(p2, only_available=True))
+        return p+moves
 
     def maximize(grid: Grid, options, a, b)->tuple:
         if len(grid.getAvailableCells()) == 0: #terminal state
             return None
         ans = (None, -10000000000)
         for child in options:
-            print(child)
             list1 = [child]
             output = PlayerAI.minimize(grid, list1, a, b)
             if output[1] > ans[1]: #utility
@@ -144,7 +144,8 @@ class PlayerAI(BaseAI):
             return None
         ans = (None, 10000000000) #100000000 is initial utility value
         for child in options:
-            utility = PlayerAI.utility_trap(grid.find(1), child)
+            utility = PlayerAI.utility_trap(grid, grid.find(1), grid.find(2), child)
+            print(child, utility)
             if utility < ans[1]:
                 ans = (child, utility)
             if ans[1] <= a:
