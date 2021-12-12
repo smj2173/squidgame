@@ -102,19 +102,27 @@ class PlayerAI(BaseAI):
         #chance of computer trap NOT landing at cell 
         chance = 1 - PlayerAI.utility_trap(grid, grid.find(1), grid.find(2), cell)
 
-       
+        #game status (how far into the game)
+        game_status = len(grid.getAvailableCells()) / 49 
+
         player_neighbors = grid.get_neighbors(cell, only_available=True)
 
         #moves player2 can make 
         opponent_neighbors = grid.get_neighbors(grid.find(2), only_available=True)
 
-        #winning
-        if len(player_neighbors) > len(opponent_neighbors): 
-            #attack 
-            return ((len(player_neighbors) * 2)- len(opponent_neighbors))*chance
+        if game_status < 0.5 :
+            #winning
+            if len(player_neighbors) > len(opponent_neighbors): 
+                #attack 
+                return (len(player_neighbors) - (2 * len(opponent_neighbors)))*chance
+            else: 
+                #defense
+                return ((len(player_neighbors) * 2)- len(opponent_neighbors))*chance
+        
+        #late into the game --> play defense
         else: 
-            #defense
-            return (len(player_neighbors) - (2 * len(opponent_neighbors)))*chance
+            return ((len(player_neighbors) * 2)- len(opponent_neighbors))*chance
+            
 
 
 
