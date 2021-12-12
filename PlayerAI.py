@@ -43,16 +43,11 @@ class PlayerAI(BaseAI):
         """
         playerPos = PlayerAI.getPosition(self)
         depth = 0
-        print("player1 at " + str(playerPos))
         #get move from heuristic
         avaliable_cells = grid.get_neighbors(playerPos,True)
-        print("avaliable cells: " + str(avaliable_cells))
-        for child in avaliable_cells:
-            print(str(child) + "'s utility: " +  str(PlayerAI.getMoveHeuristic(self, grid, child))) 
 
         # call and return outcome of moveExpectedMinimax for decision
         move = PlayerAI.moveExpectedMinimax(self, grid, avaliable_cells, playerPos, True, depth, -10000000000, 10000000000)
-        print("utility is" + str(move[1]))
 
         return PlayerAI.moveDecision(self, grid, move[1], avaliable_cells) #should be move[0] but keeping this for now for code to work 
    
@@ -145,21 +140,6 @@ class PlayerAI(BaseAI):
         moves = len(grid.get_neighbors(option, only_available=True)) - len(grid.get_neighbors(p2, only_available=True))
         return p*moves
 
-        p1_neighbors = len(grid.get_neighbors(p1, only_available=True))
-        op_neighbors = len(grid.get_neighbors(p2, only_available=True))
-        if game_status < 0.5 :
-            #winning
-            if p1_neighbors > op_neighbors: 
-                #attack 
-                return (p1_neighbors - (2 * op_neighbors))*p
-            else: 
-                #defense
-                return ((p1_neighbors * 2)- op_neighbors)*p
-        
-        #late into the game --> play defense
-        else: 
-            return ((p1_neighbors * 2)- op_neighbors)*p
-
     def maximize(grid: Grid, options, a, b)->tuple:
         if len(grid.getAvailableCells()) == 0: #terminal state
             return None
@@ -181,7 +161,6 @@ class PlayerAI(BaseAI):
         ans = (None, 10000000000) #100000000 is initial utility value
         for child in options:
             utility = PlayerAI.utility_trap(grid, grid.find(1), grid.find(2), child)
-            print(child, utility)
             if utility < ans[1]:
                 ans = (child, utility)
             if ans[1] <= a:
@@ -203,7 +182,6 @@ class PlayerAI(BaseAI):
         Note that you are not required to account for the probabilities of it landing in a different cell
         You may adjust the input variables as you wish (though it is not necessary). Output has to be (x,y) coordinates.
         """
-        available_cells = grid.getAvailableCells()
         options = PlayerAI.getTrapHeuristic(self, grid) #possible trap locations
         ans = PlayerAI.decision(grid, options)
         return ans
