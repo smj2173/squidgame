@@ -97,6 +97,13 @@ class PlayerAI(BaseAI):
     def getMoveHeuristic(self, grid : Grid, cell : tuple) -> int:
         # the difference between the current number of moves Player (You) 
         #can make and the current number of moves the opponent can make.
+        score = self.one_cell_look_ahead(grid, cell)
+        return score         
+
+    def one_cell_look_ahead(self, curr_grid: Grid, cell: tuple) -> int:
+        #score for one cell ahead if player moves to this cell
+        #get next_board
+        grid = PlayerAI.get_next_grid(curr_grid,cell)
 
         #moves player1 can make at this cell
         #chance of computer trap NOT landing at cell 
@@ -110,8 +117,9 @@ class PlayerAI(BaseAI):
         #moves player2 can make 
         opponent_neighbors = grid.get_neighbors(grid.find(2), only_available=True)
 
+        #early into the game --> attack/defense depending on who is winning
         if game_status < 0.5 :
-            #winning
+            #winning --> attack
             if len(player_neighbors) > len(opponent_neighbors): 
                 #attack 
                 return (len(player_neighbors) - (2 * len(opponent_neighbors)))*chance
@@ -119,18 +127,22 @@ class PlayerAI(BaseAI):
                 #defense
                 return ((len(player_neighbors) * 2)- len(opponent_neighbors))*chance
         
-        #late into the game --> play defense
+        #late into the game --> play only defense
         else: 
             return ((len(player_neighbors) * 2)- len(opponent_neighbors))*chance
-            
 
+
+    def get_next_grid(grid, cell) -> Grid:
+        next_grid = grid.clone()
+        next_grid.setCellValue(cell,1)
+        return next_grid
 
 
     def utility_trap(grid, p1, p2, option):     
         #option is intended position (i.e. one of the values of options)
         p = 1 - 0.05*(Utils.manhattan_distance(p1, option) - 1)
         moves = len(grid.get_neighbors(option, only_available=True)) - len(grid.get_neighbors(p2, only_available=True))
-        return p+moves
+        return p*moves
 
     def maximize(grid: Grid, options, a, b)->tuple:
         if len(grid.getAvailableCells()) == 0: #terminal state
