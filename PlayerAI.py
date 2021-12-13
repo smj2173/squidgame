@@ -11,8 +11,6 @@ from ComputerAI import ComputerAI
 sys.path.append(os.getcwd())
 sys.setrecursionlimit(10000)
 
-# TO BE IMPLEMENTED
-# 
 class PlayerAI(BaseAI):
 
     def __init__(self) -> None:
@@ -44,11 +42,11 @@ class PlayerAI(BaseAI):
         """
         playerPos = PlayerAI.getPosition(self)
         depth = 0
-        #get move from heuristic
         avaliable_cells = grid.get_neighbors(playerPos,True)
-
+        
         # call and return outcome of moveExpectedMinimax for decision
         move = PlayerAI.moveExpectedMinimax(self, grid, avaliable_cells, playerPos, True, depth, -10000000000, 10000000000)
+        #print("utility is" + str(move[1]))
 
         return PlayerAI.moveDecision(self, grid, move[1], avaliable_cells) #should be move[0] but keeping this for now for code to work 
    
@@ -66,7 +64,6 @@ class PlayerAI(BaseAI):
             return (None, PlayerAI.getMoveHeuristic(self, grid, pos)) 
 
         if maximizing: 
-            #print("maximizing")
             maxNode = (None, -10000000000) #(maxChild, maxUtility)
             for child in potential_cells:
                 minNode = PlayerAI.moveExpectedMinimax(self, grid, potential_cells, child, False, depth+1, a, b)
@@ -78,7 +75,6 @@ class PlayerAI(BaseAI):
             return maxNode
 
         else:
-            #print("minimizing")
             minNode = (None, 10000000000) #(minChild, minUtility)
             for child in potential_cells:    
                 maxNode = PlayerAI.moveExpectedMinimax(self, grid,potential_cells, child, True, depth+1, a, b)
@@ -88,7 +84,6 @@ class PlayerAI(BaseAI):
                 if b <= a:
                     break
             return minNode
-
 
     def getMoveHeuristic(self, grid : Grid, cell : tuple) -> int:
         # the difference between the current number of moves Player (You) 
@@ -104,7 +99,6 @@ class PlayerAI(BaseAI):
 
         grid = PlayerAI.get_next_grid(curr_grid,cell)
 
-        #moves player1 can make at this cell
         #chance of computer trap NOT landing at cell 
         chance = 1 - PlayerAI.utility_trap(grid, grid.find(player_num), grid.find(op_num), cell)
 
@@ -112,8 +106,6 @@ class PlayerAI(BaseAI):
         game_status = len(grid.getAvailableCells()) / 49 
 
         player_neighbors = grid.get_neighbors(cell, only_available=True)
-
-        #moves player2 can make 
         opponent_neighbors = grid.get_neighbors(grid.find(2), only_available=True)
 
         #early into the game --> attack/defense depending on who is winning
@@ -130,12 +122,10 @@ class PlayerAI(BaseAI):
         else: 
             return ((len(player_neighbors) * 2)- len(opponent_neighbors))*chance
 
-
     def get_next_grid(grid, cell) -> Grid:
         next_grid = grid.clone()
         next_grid.setCellValue(cell,1)
         return next_grid
-
 
     def utility_trap(grid, p1, p2, option):     
         #option is intended position (i.e. one of the values of options)
@@ -178,7 +168,6 @@ class PlayerAI(BaseAI):
         ans =  PlayerAI.maximize(self, grid, options, -10000000000, 10000000000)
         return ans[0]
 
-
     def getTrap(self, grid : Grid) -> tuple:
         """ 
         The function should return a tuple of (x,y) coordinates to which the player *WANTS* to throw the trap.
@@ -190,8 +179,7 @@ class PlayerAI(BaseAI):
         options = PlayerAI.getTrapHeuristic(self, grid) #possible trap locations
         ans = PlayerAI.decision(self, grid, options)
         return ans
-
-        
+   
     def getTrapHeuristic(self, grid : Grid) -> list:    
         #heuristic to determine which cells to consider > slowly reduce which cells are available to throw trap
         op_num = 3 - PlayerAI.getPlayerNum(self)
