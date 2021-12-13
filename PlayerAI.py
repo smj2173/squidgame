@@ -6,6 +6,7 @@ import os
 from BaseAI import BaseAI
 from Grid import Grid
 import Utils
+from ComputerAI import ComputerAI
 #setting path to parent directory
 sys.path.append(os.getcwd())
 sys.setrecursionlimit(10000)
@@ -92,17 +93,20 @@ class PlayerAI(BaseAI):
     def getMoveHeuristic(self, grid : Grid, cell : tuple) -> int:
         # the difference between the current number of moves Player (You) 
         #can make and the current number of moves the opponent can make.
-        score = self.one_cell_look_ahead(grid, cell)
+        score = PlayerAI.one_cell_look_ahead(self, grid, cell)
         return score         
 
     def one_cell_look_ahead(self, curr_grid: Grid, cell: tuple) -> int:
         #score for one cell ahead if player moves to this cell
         #get next_board
+        player_num = PlayerAI.getPlayerNum(self)
+        op_num = 3 - player_num
+
         grid = PlayerAI.get_next_grid(curr_grid,cell)
 
         #moves player1 can make at this cell
         #chance of computer trap NOT landing at cell 
-        chance = 1 - PlayerAI.utility_trap(grid, grid.find(1), grid.find(2), cell)
+        chance = 1 - PlayerAI.utility_trap(grid, grid.find(player_num), grid.find(op_num), cell)
 
         #game status (how far into the game)
         game_status = len(grid.getAvailableCells()) / 49 
@@ -135,18 +139,17 @@ class PlayerAI(BaseAI):
 
     def utility_trap(grid, p1, p2, option):     
         #option is intended position (i.e. one of the values of options)
-        game_status = len(grid.getAvailableCells()) / 49 
         p = 1 - 0.05*(Utils.manhattan_distance(p1, option) - 1)
         moves = len(grid.get_neighbors(option, only_available=True)) - len(grid.get_neighbors(p2, only_available=True))
         return p*moves
 
-    def maximize(grid: Grid, options, a, b)->tuple:
+    def maximize(self, grid: Grid, options, a, b)->tuple:
         if len(grid.getAvailableCells()) == 0: #terminal state
             return None
         ans = (None, -10000000000)
         for child in options:
             list1 = [child]
-            output = PlayerAI.minimize(grid, list1, a, b)
+            output = PlayerAI.minimize(self, grid, list1, a, b)
             if output[1] > ans[1]: #utility
                 ans = (child, output[1])
             if ans[1] >= b:
@@ -155,12 +158,14 @@ class PlayerAI(BaseAI):
                 a = ans[1]
         return ans
 
-    def minimize(grid : Grid, options, a, b)->tuple:
+    def minimize(self, grid : Grid, options, a, b)->tuple:
+        player_num = PlayerAI.getPlayerNum(self)
+        op_num = 3 - player_num
         if len(grid.getAvailableCells()) == 0: #terminal state
             return None
         ans = (None, 10000000000) #100000000 is initial utility value
         for child in options:
-            utility = PlayerAI.utility_trap(grid, grid.find(1), grid.find(2), child)
+            utility = PlayerAI.utility_trap(grid, grid.find(player_num), grid.find(op_num), child)
             if utility < ans[1]:
                 ans = (child, utility)
             if ans[1] <= a:
@@ -169,8 +174,8 @@ class PlayerAI(BaseAI):
                 b = ans[1]
         return ans
 
-    def decision(grid: Grid, options)->tuple:
-        ans =  PlayerAI.maximize(grid, options, -10000000000, 10000000000)
+    def decision(self, grid: Grid, options)->tuple:
+        ans =  PlayerAI.maximize(self, grid, options, -10000000000, 10000000000)
         return ans[0]
 
 
@@ -183,15 +188,15 @@ class PlayerAI(BaseAI):
         You may adjust the input variables as you wish (though it is not necessary). Output has to be (x,y) coordinates.
         """
         options = PlayerAI.getTrapHeuristic(self, grid) #possible trap locations
-        ans = PlayerAI.decision(grid, options)
+        ans = PlayerAI.decision(self, grid, options)
         return ans
 
         
     def getTrapHeuristic(self, grid : Grid) -> list:    
         #heuristic to determine which cells to consider > slowly reduce which cells are available to throw trap
-
-        pos_1 = grid.find(1) #position of player 1 (us)
-        pos_2 = grid.find(2) #position of player 2 (opponent) 
+        op_num = 3 - PlayerAI.getPlayerNum(self)
+        pos_1 = PlayerAI.getPosition(self) #position of player 1 (us)
+        pos_2 = grid.find(op_num)
         #opponent can also be player 3 (not computer)
         options = []
 
